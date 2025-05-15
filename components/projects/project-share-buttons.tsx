@@ -71,12 +71,12 @@ export function ProjectShareButtons({ projectId, projectTitle }: ProjectShareBut
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="w-full sm:w-auto">
           <Share2 className="h-4 w-4 mr-2" />
           Share
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem onClick={handleCopyLink} disabled={isCopying}>
           <Copy className="h-4 w-4 mr-2" />
           Copy Link

@@ -149,13 +149,13 @@ export function RelatedDevelopers({ projectSkills, currentUserId }: RelatedDevel
               <img
                 src={developer.avatar_url || "/placeholder.svg?height=40&width=40&query=avatar"}
                 alt={developer.username}
-                className="h-10 w-10 rounded-full object-cover"
+                className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover flex-shrink-0"
               />
               <div className="flex-1 min-w-0">
                 <h4 className="font-medium truncate">{developer.full_name || developer.username}</h4>
                 <p className="text-xs text-muted-foreground truncate">{developer.skills.join(", ")}</p>
               </div>
-              <Button asChild variant="outline" size="sm">
+              <Button asChild variant="outline" size="sm" className="flex-shrink-0">
                 <Link href={`/profile/${developer.username}`}>View</Link>
               </Button>
             </div>

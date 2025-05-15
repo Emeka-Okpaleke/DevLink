@@ -22,11 +22,38 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [isClient, setIsClient] = useState(false)
+  const [debugInfo, setDebugInfo] = useState<string | null>(null)
 
   // Set isClient to true when component mounts on client
   useEffect(() => {
     setIsClient(true)
-  }, [])
+
+    // Check if Supabase is initialized properly
+    if (!supabase) {
+      setDebugInfo("Supabase client not initialized properly")
+    } else {
+      setDebugInfo(null)
+    }
+  }, [supabase])
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data } = await supabase.auth.getSession()
+        if (data.session) {
+          console.log("User already has a session, redirecting to dashboard")
+          router.push("/dashboard")
+        }
+      } catch (error) {
+        console.error("Error checking session:", error)
+      }
+    }
+
+    if (isClient) {
+      checkSession()
+    }
+  }, [isClient, router, supabase.auth])
 
   // Handle error params from auth callback
   useEffect(() => {
@@ -40,26 +67,68 @@ export default function LoginPage() {
     }
   }, [searchParams])
 
+  // Set up auth state change listener
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state change in login page:", event)
+
+      if (event === "SIGNED_IN" && session) {
+        console.log("User signed in, redirecting to dashboard")
+        // Use a timeout to ensure state updates complete before redirect
+        setTimeout(() => {
+          router.push("/dashboard")
+        }, 500)
+      }
+    })
+
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }, [router, supabase.auth])
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setDebugInfo(null)
 
     try {
+      console.log("Attempting to sign in with email:", email)
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
       if (error) {
+        console.error("Login error:", error)
         throw error
       }
 
-      // Use window.location for a full page reload
-      window.location.href = "/dashboard"
+      console.log("Login successful, user:", data.user?.id)
+
+      // Check if we got a valid session
+      if (!data.session) {
+        setDebugInfo("Login succeeded but no session was returned")
+        setLoading(false)
+        return
+      }
+
+      // The redirect will be handled by the auth state change listener
+      // This prevents the loading state from getting stuck
+      console.log("Authentication successful, waiting for redirect...")
+
+      // Add a safety timeout to reset loading state if redirect doesn't happen
+      setTimeout(() => {
+        if (document.visibilityState === "visible") {
+          console.log("Redirect timeout reached, manually redirecting")
+          window.location.href = "/dashboard"
+        }
+      }, 3000)
     } catch (error: any) {
       console.error("Login error:", error)
       setError(error.message || "Login failed. Please check your credentials.")
+      setDebugInfo(`Error type: ${error.name}, Status: ${error.status || "unknown"}`)
       setLoading(false)
     }
   }
@@ -68,15 +137,22 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "github",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        console.error("GitHub login error:", error)
+        setError(error.message)
+        setLoading(false)
+      }
+    } catch (error: any) {
+      console.error("GitHub login error:", error)
+      setError(error.message || "GitHub login failed")
       setLoading(false)
     }
   }
@@ -90,18 +166,22 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
-    })
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      })
 
-    if (error) {
-      setError(error.message)
-    } else {
-      setError(null)
-      alert("Password reset email sent. Check your inbox.")
+      if (error) {
+        setError(error.message)
+      } else {
+        setError(null)
+        alert("Password reset email sent. Check your inbox.")
+      }
+    } catch (error: any) {
+      setError(error.message || "Failed to send password reset email")
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (
@@ -117,6 +197,11 @@ export default function LoginPage() {
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            {debugInfo && (
+              <Alert variant="default" className="bg-yellow-50 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                <AlertDescription className="text-xs">{debugInfo}</AlertDescription>
               </Alert>
             )}
             <form onSubmit={handleEmailLogin} className="space-y-4">

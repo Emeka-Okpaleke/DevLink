@@ -162,8 +162,13 @@ export function ProjectComments({ projectId }: ProjectCommentsProps) {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 disabled={isSubmitting || !currentUser}
+                className="min-h-[100px]"
               />
-              <Button type="submit" disabled={isSubmitting || !newComment.trim() || !currentUser}>
+              <Button
+                type="submit"
+                disabled={isSubmitting || !newComment.trim() || !currentUser}
+                className="w-full sm:w-auto"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -192,8 +197,13 @@ export function ProjectComments({ projectId }: ProjectCommentsProps) {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             disabled={isSubmitting || !currentUser}
+            className="min-h-[100px]"
           />
-          <Button type="submit" disabled={isSubmitting || !newComment.trim() || !currentUser}>
+          <Button
+            type="submit"
+            disabled={isSubmitting || !newComment.trim() || !currentUser}
+            className="w-full sm:w-auto"
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -212,20 +222,20 @@ export function ProjectComments({ projectId }: ProjectCommentsProps) {
         ) : (
           <div className="space-y-4">
             {comments.map((comment) => (
-              <div key={comment.id} className="flex gap-4 pb-4 border-b">
+              <div key={comment.id} className="flex gap-3 pb-4 border-b">
                 <img
                   src={comment.profiles.avatar_url || "/placeholder.svg?height=40&width=40&query=avatar"}
                   alt={comment.profiles.username}
-                  className="h-10 w-10 rounded-full object-cover"
+                  className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover flex-shrink-0"
                 />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                     <h4 className="font-medium">@{comment.profiles.username}</h4>
                     <span className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                     </span>
                   </div>
-                  <p className="mt-1">{comment.content}</p>
+                  <p className="mt-1 break-words">{comment.content}</p>
                 </div>
               </div>
             ))}

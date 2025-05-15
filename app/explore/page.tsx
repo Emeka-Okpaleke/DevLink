@@ -7,11 +7,14 @@ export default async function ExplorePage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
+  // Await searchParams to comply with Next.js 14 requirements
+  const params = await Promise.resolve(searchParams)
+
   const supabase = await createServerClient()
 
-  const search = typeof searchParams.search === "string" ? searchParams.search : ""
-  const skill = typeof searchParams.skill === "string" ? searchParams.skill : ""
-  const location = typeof searchParams.location === "string" ? searchParams.location : ""
+  const search = typeof params.search === "string" ? params.search : ""
+  const skill = typeof params.skill === "string" ? params.skill : ""
+  const location = typeof params.location === "string" ? params.location : ""
 
   let query = supabase
     .from("profiles")

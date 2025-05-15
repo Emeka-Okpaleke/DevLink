@@ -1,22 +1,30 @@
-import { notFound } from "next/navigation"
-import { createServerClient } from "@/lib/supabase/server"
+import { Suspense } from "react"
 import { ProfileHeader } from "@/components/profile/profile-header"
 import { ProjectsSection } from "@/components/profile/projects-section"
 import { SkillsSection } from "@/components/profile/skills-section"
 import { SocialLinks } from "@/components/profile/social-links"
+import { createServerClient } from "@/lib/supabase/server"
+import { notFound } from "next/navigation"
 
-export default async function ProfilePage({
-  params,
-}: {
-  params: { username: string }
-}) {
+// This is a workaround for Next.js 14's dynamic route parameters
+export default function ProfilePage({ params }: { params: { username: string } }) {
+  // Instead of using params directly, we pass it to a component that uses Suspense
+  return (
+    <Suspense fallback={<div className="container mx-auto py-8">Loading profile...</div>}>
+      <ProfileContent username={params.username} />
+    </Suspense>
+  )
+}
+
+// This component handles the actual data fetching and rendering
+async function ProfileContent({ username }: { username: string }) {
   const supabase = await createServerClient()
 
   // Get profile by username
   const { data: profile } = await supabase
     .from("profiles")
     .select("*")
-    .eq("username", params.username)
+    .eq("username", username)
     .eq("is_public", true)
     .single()
 

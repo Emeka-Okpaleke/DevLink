@@ -1,4 +1,10 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export interface Database {
   public: {
@@ -248,6 +254,72 @@ export interface Database {
           created_at?: string
         }
       }
+      conversations: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      conversation_participants: {
+        Row: {
+          id: string
+          conversation_id: string
+          user_id: string
+          created_at: string
+          last_read_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          user_id: string
+          created_at?: string
+          last_read_at?: string
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          user_id?: string
+          created_at?: string
+          last_read_at?: string
+        }
+      }
+      messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          sender_id: string
+          content: string
+          created_at: string
+          is_read: boolean
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          sender_id: string
+          content: string
+          created_at?: string
+          is_read?: boolean
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          sender_id?: string
+          content?: string
+          created_at?: string
+          is_read?: boolean
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -267,10 +339,10 @@ export interface Database {
       }
       track_project_view: {
         Args: {
-          project_id: string
-          user_id?: string | null
-          ip_address?: string | null
-          user_agent?: string | null
+          p_project_id: string
+          p_user_id?: string | null
+          p_ip_address?: string | null
+          p_user_agent?: string | null
         }
         Returns: number
       }
@@ -314,6 +386,65 @@ export interface Database {
       get_service_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_or_create_conversation: {
+        Args: {
+          user1_id: string
+          user2_id: string
+        }
+        Returns: string
+      }
+       get_conversation_unread_count: {
+        Args: {
+          conv_id: string
+          p_user_id: string
+        }
+        Returns: number
+      }
+      get_simple_conversations: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          conversation_id: string
+          created_at: string
+          updated_at: string
+          other_user_id: string
+          other_username: string
+          other_full_name: string
+          other_avatar_url: string
+        }[]
+      }
+      get_conversation_messages: {
+        Args: {
+          conv_id: string
+        }
+        Returns: {
+          id: string
+          conversation_id: string
+          sender_id: string
+          content: string
+          created_at: string
+          is_read: boolean
+          sender_username: string
+          sender_avatar_url: string | null
+        }[]
+      }
+      get_participant_data: {
+          Args: {
+            conv_id: string
+            p_user_id: string
+          }
+          Returns: {
+            id: string
+            last_read_at: string
+          }[]
+        }
+      get_total_unread_count: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: number
       }
     }
     Enums: {

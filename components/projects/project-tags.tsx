@@ -118,7 +118,7 @@ export function ProjectTags({ projectId, canEdit }: ProjectTagsProps) {
         <div className="flex flex-wrap gap-2">
           {tags.length > 0 ? (
             tags.map((tag) => (
-              <Badge key={tag.id} variant="secondary" className="flex items-center gap-1">
+              <Badge key={tag.id} variant="secondary" className="flex items-center gap-1 text-sm py-1 px-2">
                 {tag.name}
                 {canEdit && (
                   <Button
@@ -140,7 +140,7 @@ export function ProjectTags({ projectId, canEdit }: ProjectTagsProps) {
       </CardContent>
       {canEdit && (
         <CardFooter>
-          <form onSubmit={handleAddTag} className="flex w-full gap-2">
+          <form onSubmit={handleAddTag} className="flex w-full flex-col sm:flex-row gap-2">
             <Input
               placeholder="Add a tag..."
               value={newTag}

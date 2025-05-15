@@ -85,18 +85,20 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <DashboardShell>
       <DashboardHeader heading={project.title} text="View and manage your project.">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline">
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" size="sm">
             <Link href="/dashboard/projects">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Projects
+              <span className="hidden sm:inline">Back to Projects</span>
+              <span className="sm:hidden">Back</span>
             </Link>
           </Button>
           {canEdit && (
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" size="sm">
               <Link href={`/dashboard/projects/${projectId}/analytics`}>
                 <BarChart3 className="mr-2 h-4 w-4" />
-                Detailed Analytics
+                <span className="hidden sm:inline">Detailed Analytics</span>
+                <span className="sm:hidden">Analytics</span>
               </Link>
             </Button>
           )}
@@ -104,26 +106,26 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </div>
       </DashboardHeader>
 
-      <div className="grid gap-8 grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3 lg:gap-8">
         <div className="lg:col-span-2 space-y-6">
           <Card>
-            <CardHeader className="relative pb-0">
+            <CardHeader className="relative pb-0 space-y-2">
               {project.is_featured && (
                 <Badge className="absolute right-6 top-6" variant="secondary">
                   Featured
                 </Badge>
               )}
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                  <Calendar className="h-4 w-4" />
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <div className="flex items-center gap-1 text-muted-foreground text-sm">
+                  <Calendar className="h-4 w-4 flex-shrink-0" />
                   <span>Created {formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}</span>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                  <Eye className="h-4 w-4" />
+                <div className="flex items-center gap-1 text-muted-foreground text-sm">
+                  <Eye className="h-4 w-4 flex-shrink-0" />
                   <span>123 views</span>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                  <Star className="h-4 w-4" />
+                <div className="flex items-center gap-1 text-muted-foreground text-sm">
+                  <Star className="h-4 w-4 flex-shrink-0" />
                   <span>{endorsementCount || 0} endorsements</span>
                 </div>
               </div>
@@ -134,13 +136,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   <img
                     src={project.image_url || "/placeholder.svg"}
                     alt={project.title}
-                    className="w-full h-[300px] object-cover rounded-lg"
+                    className="w-full h-[200px] sm:h-[250px] md:h-[300px] object-cover rounded-lg"
                   />
                 </div>
               )}
 
               <div className="prose max-w-none">
-                <p className="text-lg">{project.description}</p>
+                <p className="text-base sm:text-lg">{project.description}</p>
               </div>
 
               <div className="mt-6 flex flex-wrap gap-2">
@@ -151,10 +153,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 ))}
               </div>
             </CardContent>
-            <CardFooter className="flex justify-between border-t pt-6">
-              <div className="flex gap-2">
+            <CardFooter className="flex flex-col sm:flex-row justify-between gap-4 border-t pt-6">
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                 {project.github_url && (
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
                     <a href={project.github_url} target="_blank" rel="noopener noreferrer">
                       <Github className="mr-2 h-4 w-4" />
                       GitHub
@@ -162,7 +164,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   </Button>
                 )}
                 {project.live_url && (
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
                     <a href={project.live_url} target="_blank" rel="noopener noreferrer">
                       <Globe className="mr-2 h-4 w-4" />
                       Live Demo
@@ -170,7 +172,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   </Button>
                 )}
               </div>
-              <div className="flex gap-2">
+              <div className="w-full sm:w-auto">
                 <ProjectShareButtons projectId={projectId} projectTitle={project.title} />
               </div>
             </CardFooter>

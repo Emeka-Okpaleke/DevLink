@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,12 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  // Set isClient to true when component mounts on client
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,7 +50,6 @@ export default function SignupPage() {
       }
 
       // Check if username is available
-      console.log("Checking if username is available:", username)
       const { data: existingUser, error: usernameError } = await supabase
         .from("profiles")
         .select("username")
@@ -59,7 +64,8 @@ export default function SignupPage() {
         throw new Error("Username is already taken")
       }
 
-      console.log("Username is available, proceeding with signup")
+      // Get the current site URL (works in both development and production)
+      const siteUrl = window.location.origin
 
       // Sign up with email and password
       const { data, error: signUpError } = await supabase.auth.signUp({
@@ -69,7 +75,7 @@ export default function SignupPage() {
           data: {
             username,
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${siteUrl}/auth/callback`,
         },
       })
 
@@ -77,15 +83,12 @@ export default function SignupPage() {
         throw signUpError
       }
 
-      console.log("Signup successful:", data)
-
       // Check if email confirmation is required
       if (data?.user && !data?.session) {
         setSuccess("Registration successful! Please check your email for a confirmation link.")
       } else {
         // Create profile
         if (data?.user) {
-          console.log("Creating profile for user:", data.user.id)
           const { error: profileError } = await supabase.from("profiles").insert({
             id: data.user.id,
             username,
@@ -99,13 +102,10 @@ export default function SignupPage() {
           if (profileError) {
             console.error("Error creating profile:", profileError)
             // Continue anyway, we'll handle this on the dashboard
-          } else {
-            console.log("Profile created successfully")
           }
         }
 
         if (data?.user && data?.session) {
-          console.log("Signup successful with session, redirecting...")
           window.location.href = "/dashboard"
         }
       }
@@ -122,10 +122,13 @@ export default function SignupPage() {
     setError(null)
 
     try {
+      // Get the current site URL (works in both development and production)
+      const siteUrl = window.location.origin
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "github",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${siteUrl}/auth/callback`,
         },
       })
 
@@ -146,77 +149,85 @@ export default function SignupPage() {
           <CardTitle className="text-2xl font-bold">Sign up</CardTitle>
           <CardDescription>Create an account to showcase your developer portfolio</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+        {isClient ? (
+          <CardContent className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-          {success && (
-            <Alert>
-              <AlertDescription>{success}</AlertDescription>
-            </Alert>
-          )}
+            {success && (
+              <Alert>
+                <AlertDescription>{success}</AlertDescription>
+              </Alert>
+            )}
 
-          <form onSubmit={handleEmailSignup} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                placeholder="johndoe"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                minLength={3}
-              />
+            <form onSubmit={handleEmailSignup} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  placeholder="johndoe"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  minLength={3}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+                <p className="text-xs text-muted-foreground">Password must be at least 6 characters</p>
+              </div>
+              <Button type="submit" className="w-full" disabled={loading || !!success}>
+                {loading ? "Creating account..." : "Create account"}
+              </Button>
+            </form>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
-              <p className="text-xs text-muted-foreground">Password must be at least 6 characters</p>
-            </div>
-            <Button type="submit" className="w-full" disabled={loading || !!success}>
-              {loading ? "Creating account..." : "Create account"}
+            <Button
+              variant="outline"
+              type="button"
+              className="w-full"
+              onClick={handleGithubSignup}
+              disabled={loading || !!success}
+            >
+              <Github className="mr-2 h-4 w-4" />
+              GitHub
             </Button>
-          </form>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+          </CardContent>
+        ) : (
+          <CardContent className="space-y-4">
+            <div className="h-[300px] flex items-center justify-center">
+              <p className="text-muted-foreground">Loading signup form...</p>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            type="button"
-            className="w-full"
-            onClick={handleGithubSignup}
-            disabled={loading || !!success}
-          >
-            <Github className="mr-2 h-4 w-4" />
-            GitHub
-          </Button>
-        </CardContent>
+          </CardContent>
+        )}
         <CardFooter>
           <p className="text-center text-sm text-muted-foreground w-full">
             Already have an account?{" "}

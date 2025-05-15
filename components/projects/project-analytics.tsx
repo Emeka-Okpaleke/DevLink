@@ -92,49 +92,45 @@ export function ProjectAnalytics({ projectId }: ProjectAnalyticsProps) {
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 mb-2">
-              <Eye className="h-6 w-6 text-primary" />
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 mb-2">
+              <Eye className="h-5 w-5 text-primary" />
             </div>
-            {isLoading ? (
-              <Skeleton className="h-8 w-16" />
-            ) : (
-              <div className="text-2xl font-bold">{analytics.views}</div>
-            )}
+            {isLoading ? <Skeleton className="h-7 w-14" /> : <div className="text-xl font-bold">{analytics.views}</div>}
             <div className="text-xs text-muted-foreground">Total Views</div>
           </div>
 
           <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 mb-2">
-              <Users className="h-6 w-6 text-primary" />
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 mb-2">
+              <Users className="h-5 w-5 text-primary" />
             </div>
             {isLoading ? (
-              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-7 w-14" />
             ) : (
-              <div className="text-2xl font-bold">{analytics.uniqueViewers}</div>
+              <div className="text-xl font-bold">{analytics.uniqueViewers}</div>
             )}
             <div className="text-xs text-muted-foreground">Unique Viewers</div>
           </div>
 
           <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 mb-2">
-              <Star className="h-6 w-6 text-primary" />
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 mb-2">
+              <Star className="h-5 w-5 text-primary" />
             </div>
             {isLoading ? (
-              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-7 w-14" />
             ) : (
-              <div className="text-2xl font-bold">{analytics.endorsements}</div>
+              <div className="text-xl font-bold">{analytics.endorsements}</div>
             )}
             <div className="text-xs text-muted-foreground">Endorsements</div>
           </div>
 
           <div className="flex flex-col items-center">
-            <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 mb-2">
-              <MessageSquare className="h-6 w-6 text-primary" />
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 mb-2">
+              <MessageSquare className="h-5 w-5 text-primary" />
             </div>
             {isLoading ? (
-              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-7 w-14" />
             ) : (
-              <div className="text-2xl font-bold">{analytics.comments}</div>
+              <div className="text-xl font-bold">{analytics.comments}</div>
             )}
             <div className="text-xs text-muted-foreground">Comments</div>
           </div>

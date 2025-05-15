@@ -248,6 +248,72 @@ export interface Database {
           created_at?: string
         }
       }
+      conversations: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      conversation_participants: {
+        Row: {
+          id: string
+          conversation_id: string
+          user_id: string
+          created_at: string
+          last_read_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          user_id: string
+          created_at?: string
+          last_read_at?: string
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          user_id?: string
+          created_at?: string
+          last_read_at?: string
+        }
+      }
+      messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          sender_id: string
+          content: string
+          created_at: string
+          is_read: boolean
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          sender_id: string
+          content: string
+          created_at?: string
+          is_read?: boolean
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          sender_id?: string
+          content?: string
+          created_at?: string
+          is_read?: boolean
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -314,6 +380,19 @@ export interface Database {
       get_service_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_or_create_conversation: {
+        Args: {
+          user1_id: string
+          user2_id: string
+        }
+        Returns: string
+      }
+      get_unread_message_count: {
+        Args: {
+          user_id: string
+        }
+        Returns: number
       }
     }
     Enums: {
